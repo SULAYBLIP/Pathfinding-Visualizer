@@ -1,4 +1,8 @@
-#pathfinder.py
+'''
+pathfinder.py
+Visualizes shortest path from one point to another on the maze.
+'''
+
 from pprint import *
 from pygame import *
 init()
@@ -6,8 +10,8 @@ screen = display.set_mode((570,600))
 mazeList =          [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                      [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                      [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                     [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
+                     [1, 0, 'S', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                     [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 'F', 1, 1, 0, 1],
                      [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                      [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],     #2d list representation of maze
                      [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],     #used to check if player is in contact with wall
@@ -16,11 +20,11 @@ mazeList =          [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
                      [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1],
                      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],     #0 is open spot
-                     [1, 0, 0, 0, 'F', 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                      [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
                      [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
                      [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-                     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 'S', 0, 1],
+                     [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                      [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
                      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]] 
@@ -120,6 +124,7 @@ fcosti = 1
 hcosti = 2
 gcosti = 3
 parent = 4
+
 def removeDuplicates(yourList):
     final = []
     for e in yourList:
@@ -155,10 +160,10 @@ def findpath(mazeList,endx,endy,startx,starty):
     global returnlist
     currentx, currenty = startx,starty
     openlist = [[],     #node
-                [],     #fcost
-                [],     #hcost
-                [],     #gcost
-                []]     #parent
+                    [],     #fcost
+                    [],     #hcost
+                    [],     #gcost
+                    []]     #parent
     closedlist = []
     openlist[node].append((currentx,currenty))
     openlist[gcosti].append(0)
@@ -184,13 +189,12 @@ def findpath(mazeList,endx,endy,startx,starty):
             if openlist[node].count(neighbour) == 0:
                 gcost = newneighbourcost                                 #getting new costs
                 hcost = Gethcost(neighbour,endx,endy)
-                fcost = gcost+hcost
-                if openlist[node].count(neighbour) == 0:    
-                    openlist[node].append(neighbour)
-                    openlist[gcosti].append(gcost)
-                    openlist[hcosti].append(hcost)
-                    openlist[fcosti].append(fcost)
-                    openlist[parent].append (currentnode[node])               #adding neigbours to open list
+                fcost = gcost+hcost    
+                openlist[node].append(neighbour)
+                openlist[gcosti].append(gcost)
+                openlist[hcosti].append(hcost)
+                openlist[fcosti].append(fcost)
+                openlist[parent].append (currentnode[node])               #adding neigbours to open list
         for i in range (len(openlist[node])):                               #looping through open
             if openlist[fcosti][i] < currentnode[fcosti] or openlist[fcosti][i] == currentnode[fcosti] and openlist[hcosti][i] < currentnode[hcosti]:
                 current = openlist[node][i]
@@ -198,9 +202,6 @@ def findpath(mazeList,endx,endy,startx,starty):
         if len(openlist[node]) > 1:
             closedlist.append(currentnode[node])                                #adding to closed
             currenti = openlist[node].index(currentnode[node])
-            #print (currenti)
-            #pprint (openlist)
-            #print(currentnode[node])
             for i in range (len(openlist)-1):                                     #removing from open
                 del openlist[i][currenti]
                     
@@ -212,8 +213,8 @@ def findpath(mazeList,endx,endy,startx,starty):
 ##            translated = listTranslate(jumpsfound)
 ##            print (jumpsfound)
             returnlist = mazeList
-            for i in range (len(openlist[parent])):
-                point = openlist[parent][i]
+            for i in range (len(duplicatesrem)):
+                point = duplicatesrem[i]
                 x = point[0]
                 y = point[1]
                 returnlist[y][x] = "X"
@@ -225,7 +226,9 @@ def findpath(mazeList,endx,endy,startx,starty):
 findStart(mazeList)
 print(findpath(mazeList,endx,endy,startx, starty))
 while running():
+    screen.fill((0))
     drawMaze(returnlist)
     x=1
+
     display.flip()
 quit()
